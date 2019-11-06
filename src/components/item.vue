@@ -1,0 +1,68 @@
+<template>
+  <!--根组件-->
+  <div class="item-wrapper" @click="clickItem">
+    <h2 class="title">今日工作</h2>
+    <div class="content">
+      <p>今天天气非常好，很适合写代码，因为可以发家致富，你说这好不好呢今天天气非常好，很适合写代码，因为可以发家致富，你说这好不好呢今天天气非常好，很适合写代码，因为可以发家致富，你说这好不好呢今天天气非常好，很适合写代码，因为可以发家致富，你说这好不好呢今天天气非常好，很适合写代码，因为可以发家致富，你说这好不好呢</p>
+    </div>
+    <div class="info">11月6日 20:22</div>
+  </div>
+</template>
+
+<script>
+export default {
+  props: {
+    itemData: {
+      type: Object,
+      default() {
+        return {};
+      }
+    }
+  },
+  data () {
+    return {
+      
+    }
+  },
+  methods: {
+    clickItem () {
+      this.$emit('clickItem');
+    }
+  }
+};
+</script>
+
+<style scoped lang='scss'>
+.item-wrapper {
+  font-size: $font-size-mm;
+  width: 88%;
+  margin: 20px auto;
+  padding: 15px;
+  background-color: #fff;
+  border-radius: 15px;
+  color: $font-color;
+  overflow: hidden;
+  .content {
+    max-height: 125px;
+    p {
+      max-height: 125px;
+      line-height: 25px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      display: -webkit-box;
+      -webkit-line-clamp: 5;
+      -webkit-box-orient: vertical;
+    }
+  }
+  .title {
+    line-height: 2;
+    color: $font-color-d;
+    font-size: $font-size-l;
+  }
+  .info {
+    color: $font-color-ll;
+    font-size: $font-size;
+    line-height: 3;
+  }
+}
+</style>

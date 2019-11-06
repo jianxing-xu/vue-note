@@ -1,0 +1,68 @@
+<template>
+  <!--根组件-->
+  <div class="header-wrapper">
+    <div class="left" @click.stop="clickleft">
+      <span :class="['iconfont',leftIcon]"></span>
+      <span class="title">{{title}}</span>
+    </div>
+    <div class="right" @click="clickright">
+      <span class="iconfont" :class="rightIcon"></span>
+    </div>
+  </div>
+</template>
+
+<script>
+export default {
+  props: {
+    leftIcon: {
+      type: String,
+      default: ""
+    },
+    rightIcon: {
+      type: String,
+      default: ""
+    },
+    title: {
+      type: String,
+      default: "便签"
+    }
+  },
+  data () {
+    return {
+
+    }
+  },
+  methods: {
+    clickleft () {
+      this.$emit('clickleft');
+    },
+    clickright () {
+      this.$emit('clickright');
+    }
+  }
+};
+</script>
+<style scoped lang='scss'>
+.header-wrapper{
+  padding: 0 20px;
+  box-sizing: border-box;
+  font-size: $font-size-ll;
+  color: $font-color-d;
+  width: 100%;
+  min-height: 68px;
+  line-height: 68px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  .iconfont{
+    font-size: $font-size-ll;
+  }
+  .title{
+    padding-left:20px
+  }
+  .left{
+    display: flex;
+    align-items: center;
+  }
+}
+</style>

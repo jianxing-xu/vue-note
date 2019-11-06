@@ -1,0 +1,24 @@
+$radio: 375 / 10;
+@function px2rem($px){
+ @return $px / $radio + rem;
+}
+// 颜色定义规范
+$font-color-d: #111;
+$font-color: #333;
+$font-color-l: #777;
+$font-color-ll: #bbb;
+$font-color-white: #eee;
+
+
+
+$bg-color: #eee;
+
+//字体定义规范
+$font-size-s:px2rem(10);
+$font-size:px2rem(12);
+$font-size-m:px2rem(14);
+$font-size-mm:px2rem(16);
+$font-size-l:px2rem(18);
+$font-size-ll:px2rem(22);
+$color:rgb(105, 128, 230);
+
