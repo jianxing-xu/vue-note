@@ -16,11 +16,11 @@ export default {
   props: {
     leftIcon: {
       type: String,
-      default: ""
+      default: "iconmenu1153767easyiconnet"
     },
     rightIcon: {
       type: String,
-      default: ""
+      default: "iconeditor"
     },
     title: {
       type: String,

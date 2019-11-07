@@ -7,11 +7,18 @@ const routes = [
   {
     path: '/home',
     name: 'home',
-    component: () => import('@/page/home.vue')
+    component: () => import('@/page/home.vue'),
+    children: [
+      {
+        path: 'detail/:id',
+        name: 'detail',
+        component: () => import('@/page/detailEditor.vue')
+      }
+    ]
   },
   {
-    path: '/editor',
-    name: 'editor',
+    path: '/new',
+    name: 'new',
     component: () => import('@/page/detailEditor.vue')
   },
   {

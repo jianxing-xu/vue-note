@@ -55,7 +55,10 @@ table{
   
 
 /* custom */
-
+input{
+  outline: none;
+  border:0;
+}
 a{
 color: #7e8c8d;
   backface-visibility: hidden;
@@ -63,9 +66,7 @@ color: #7e8c8d;
 } 
  
 
-li{
-  list-style: none;
-}
+
   
 
 body{

@@ -21,7 +21,7 @@ export default {
   },
   data () {
     return {
-      
+
     }
   },
   methods: {
@@ -35,13 +35,14 @@ export default {
 <style scoped lang='scss'>
 .item-wrapper {
   font-size: $font-size-mm;
-  width: 88%;
-  margin: 20px auto;
+  width: 95%;
+  margin: 10px auto;
   padding: 15px;
   background-color: #fff;
   border-radius: 15px;
   color: $font-color;
   overflow: hidden;
+  box-sizing: border-box;
   .content {
     max-height: 125px;
     p {
