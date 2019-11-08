@@ -1,7 +1,12 @@
 <template>
   <!--根组件-->
   <div class="home-wrapper">
-    <Header :leftIcon="leftIcon" :rightIcon="rightIcon" />
+    <Header
+      :leftIcon="leftIcon"
+      :rightIcon="rightIcon"
+      @clickleft="leftBar"
+      @clickright="newEditor"
+    />
     <template>
       <ul class="list" v-if="mode=='column'">
         <li v-for="(item, index) in 5" :key="index">
@@ -11,46 +16,20 @@
     </template>
     <template v-if="mode=='pubu'">
       <div class="pubu">
-        <ul class="left">
-          <li>
-            <Item @clickItem="clickItem" />
+        <ul class="left" ref="left">
+          <li v-for="(note) in leftData" :key="note.tid">
+            <Item @clickItem="clickItem(note)" :note="note" />
           </li>
-          <li>
-            <Item @clickItem="clickItem" />
-          </li>
-          <li>
-            <Item @clickItem="clickItem" />
-          </li>
-          <li>
-            <Item @clickItem="clickItem" />
-          </li>
-          <li>
-            <Item @clickItem="clickItem" />
-          </li>
-
         </ul>
-        <ul class="right">
-          <li>
-            <Item @clickItem="clickItem" />
+        <ul class="right" ref="right">
+          <li v-for="(note) in rightData" :key="note.tid">
+            <Item @clickItem="clickItem(note)" :note="note" />
           </li>
-          <li>
-            <Item @clickItem="clickItem" />
-          </li>
-          <li>
-            <Item @clickItem="clickItem" />
-          </li>
-          <li>
-            <Item @clickItem="clickItem" />
-          </li>
-          <li>
-            <Item @clickItem="clickItem" />
-          </li>
-
         </ul>
       </div>
     </template>
     <transition name="slide">
-      <router-view></router-view>
+      <router-view @back="back"></router-view>
     </transition>
   </div>
 </template>
@@ -58,6 +37,7 @@
 <script>
 import Header from "@/components/header.vue";
 import Item from "@/components/item.vue";
+import { mapGetters } from "vuex";
 export default {
   data() {
     return {
@@ -65,16 +45,52 @@ export default {
       rightIcon: "iconeditor",
       mode: "pubu",
       leftData: [],
-      rightData: []
+      rightData: [],
     };
   },
+  computed: {
+    ...mapGetters(["noteList"])
+  },
   methods: {
-    clickItem() {
+    clickItem(note) {
       this.$router.push({
         name: "detail",
-        params: { id: 1 }
+        params: { tid: note.tid },
+        query: { sta: 1 }
       });
+    },
+    leftBar() {},
+    async updaeWaterfull() {
+      this.leftData = [];
+      this.rightData = [];
+      for (let i = 0; i < this.noteList.length; i++) {
+        await this.$nextTick(() => {
+          let h1 = this.$refs.left.clientHeight;
+          let h2 = this.$refs.right.clientHeight;
+          if (h1 <= h2) {
+            this.leftData.push(this.noteList[i]);
+          } else {
+            this.rightData.push(this.noteList[i]);
+          }
+        });
+      }
+    },
+    newEditor() {
+      this.$router.push({
+        name: "detail",
+        params: { tid: 0 },
+        query: { sta: 0 }
+      });
+    },
+    back() {
+      this.updaeWaterfull();
     }
+  },
+
+  mounted() {
+    this.$nextTick(() => {
+      this.updaeWaterfull();
+    });
   },
   components: {
     Header,
@@ -101,7 +117,7 @@ export default {
     top: 0;
   }
   .pubu {
-    padding: 0 5px;
+    padding: 0 2px;
     width: 100%;
     position: absolute;
     top: 68px;
@@ -110,18 +126,24 @@ export default {
     display: flex;
     box-sizing: border-box;
     .left {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      height: auto;
+      width: 50%;
+      position: absolute;
+      box-sizing: border-box;
       li {
         box-sizing: border-box;
         width: 100%;
       }
     }
     .right {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
+      li{
+        list-style: none;
+      }
+      height: auto;
+      position: absolute;
+      width: 50%;
+      right: 0;
+      box-sizing: border-box;
       li {
         box-sizing: border-box;
         width: 100%;

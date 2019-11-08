@@ -9,7 +9,7 @@
       rightIcon="iconmenu"
     />
     <div class="content">
-      <input type="text" class="title" placeholder="标题" />
+      <input v-model="title" type="text" class="title" placeholder="标题" />
       <div class="info">
         <div>
           <span class="time">12:12 |</span>
@@ -21,7 +21,7 @@
         </span>
       </div>
       <div class="rich-text">
-        <div id="editor-text" class="text" @input="textInput" contenteditable placeholder="haha"></div>
+        <div id="editor-text" class="text" @input="textInput" contenteditable v-html="note && note.innerT"></div>
         <div class="control" @click="changeStyle">
           <span data-command="insertOrderedList" class="iconfont iconordered-list"></span>
           <span data-command="insertUnorderedList" class="iconfont iconwuxu"></span>
@@ -39,21 +39,36 @@
 
 <script>
 import Header from "@/components/header.vue";
+import { newNote } from "@/assets/js/model";
+import { mapActions, mapGetters } from "vuex";
 export default {
   data() {
     return {
       fontCount: 0,
+      title: "",
+      sta: 0, //0 新建   1修改  2删除
+      note: {},
     };
   },
   computed: {
+    ...mapGetters(['noteList'])
   },
 
   methods: {
-    textInput () {
+    textInput() {
       this.fontCount = this.editorDom && this.editorDom.innerText.length;
     },
     prev() {
+      let tid = this.sta==1?this.note.tid:Date.now();
+      let note = newNote({
+        tid,
+        title: this.title,
+        group: "work",
+        innerT: this.editorDom.innerHTML
+      });
+      this.controlNoteList({ note, sta: this.sta });
       this.$router.back();
+      this.$emit("back");
     },
     showmenu() {
       console.log("showmenu");
@@ -62,10 +77,29 @@ export default {
       let dataset = { ...e.target.dataset };
       let { command, value } = dataset;
       document.execCommand(command, false, value || null);
-    }
+    },
+    _check() {
+      let sta = this.$route.query.sta;
+      this.sta = sta;
+    },
+    getCurrent () {
+      this.note = this.noteList.find(item=>{
+        return item.tid === this.tid;
+      });
+      this.title = this.note && this.note.title;
+    },
+
+    ...mapActions(["controlNoteList"])
   },
-  mounted () {
-    this.editorDom = document.getElementById('editor-text');
+  // beforeRouteLeave(to, from, next) {
+  //   next();
+  // },
+  mounted() {
+    this.editorDom = document.getElementById("editor-text");
+    this._check();
+    this.tid = this.$route.params.tid || 0;
+    this.getCurrent();
+    
   },
   components: {
     Header

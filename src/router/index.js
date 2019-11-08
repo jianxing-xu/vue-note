@@ -10,7 +10,7 @@ const routes = [
     component: () => import('@/page/home.vue'),
     children: [
       {
-        path: 'detail/:id',
+        path: 'detail/:tid',
         name: 'detail',
         component: () => import('@/page/detailEditor.vue')
       }

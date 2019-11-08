@@ -1,9 +1,9 @@
 <template>
   <!--根组件-->
   <div class="item-wrapper" @click="clickItem">
-    <h2 class="title">今日工作</h2>
-    <div class="content">
-      <p>今天天气非常好，很适合写代码，因为可以发家致富，你说这好不好呢今天天气非常好，很适合写代码，因为可以发家致富，你说这好不好呢今天天气非常好，很适合写代码，因为可以发家致富，你说这好不好呢今天天气非常好，很适合写代码，因为可以发家致富，你说这好不好呢今天天气非常好，很适合写代码，因为可以发家致富，你说这好不好呢</p>
+    <h2 class="title">{{note.title}}</h2>
+    <div class="content" v-html="note.innerT">
+      <!-- content -->
     </div>
     <div class="info">11月6日 20:22</div>
   </div>
@@ -12,21 +12,19 @@
 <script>
 export default {
   props: {
-    itemData: {
+    note: {
       type: Object,
       default() {
         return {};
       }
     }
   },
-  data () {
-    return {
-
-    }
+  data() {
+    return {};
   },
   methods: {
-    clickItem () {
-      this.$emit('clickItem');
+    clickItem() {
+      this.$emit("clickItem");
     }
   }
 };
@@ -45,15 +43,14 @@ export default {
   box-sizing: border-box;
   .content {
     max-height: 125px;
-    p {
-      max-height: 125px;
-      line-height: 25px;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      display: -webkit-box;
-      -webkit-line-clamp: 5;
-      -webkit-box-orient: vertical;
-    }
+    overflow: hidden;
+    max-height: 125px;
+    line-height: 25px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 5;
+    -webkit-box-orient: vertical;
   }
   .title {
     line-height: 2;
