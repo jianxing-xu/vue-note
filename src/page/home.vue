@@ -4,15 +4,17 @@
     <Header
       :leftIcon="leftIcon"
       :rightIcon="rightIcon"
+      :modeIcon="modeIcon"
       @clickleft="leftBar"
       @clickright="newEditor"
+      @clickmode="changeMode"
     />
     <template>
-      <ul class="list" v-if="mode=='column'">
-        <li v-for="(item, index) in 5" :key="index">
-          <Item @clickItem="clickItem" />
+      <transition-group name="list" tag="ul" class="list" v-if="mode=='column'">
+        <li v-for="(note) in noteList" :key="note.tid">
+          <Item @clickItem="clickItem(note)" :note="note" />
         </li>
-      </ul>
+      </transition-group>
     </template>
     <template v-if="mode=='pubu'">
       <div class="pubu">
@@ -43,9 +45,10 @@ export default {
     return {
       leftIcon: "iconmenu1153767easyiconnet",
       rightIcon: "iconeditor",
+      modeIcon: "iconzhuanhuan",
       mode: "pubu",
       leftData: [],
-      rightData: [],
+      rightData: []
     };
   },
   computed: {
@@ -59,8 +62,18 @@ export default {
         query: { sta: 1 }
       });
     },
+    changeMode() {
+      this.mode = this.mode === "pubu" ? "column" : "pubu";
+      if (this.mode === "pubu") {
+        this.updaeWaterfull();
+      }
+    },
     leftBar() {},
     async updaeWaterfull() {
+      if (this.mode === "column") {
+        console.log("column模式");
+        return;
+      }
       this.leftData = [];
       this.rightData = [];
       for (let i = 0; i < this.noteList.length; i++) {
@@ -88,9 +101,7 @@ export default {
   },
 
   mounted() {
-    this.$nextTick(() => {
-      this.updaeWaterfull();
-    });
+    this.updaeWaterfull();
   },
   components: {
     Header,
@@ -105,14 +116,23 @@ export default {
   height: 100%;
   position: relative;
   box-sizing: border-box;
+  .list-enter,
+  .list-leave-to {
+    transform: translate3d(30%, 0, 0);
+    opacity: 0;
+  }
+  .list-enter-active,
+  .list-leave-active {
+    transition: all 0.5s ease-in;
+  }
   .slide-enter,
   .slide-leave-to {
-    transform: translate(0, 10%);
-    opacity: 0;
+    transform: translate(100%, 0);
+    position: absolute;
   }
   .slide-enter-active,
   .slide-leave-active {
-    transition: all 0.3s;
+    transition: all 0.5s ease;
     position: absolute;
     top: 0;
   }
@@ -136,7 +156,7 @@ export default {
       }
     }
     .right {
-      li{
+      li {
         list-style: none;
       }
       height: auto;
@@ -151,6 +171,13 @@ export default {
     }
   }
   .list {
+    & > li {
+      list-style: none;
+    }
+    li {
+      transition: all 1s;
+    }
+    width: 100%;
     position: absolute;
     top: 68px;
     bottom: 0;

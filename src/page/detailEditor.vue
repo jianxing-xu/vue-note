@@ -21,7 +21,13 @@
         </span>
       </div>
       <div class="rich-text">
-        <div id="editor-text" class="text" @input="textInput" contenteditable v-html="note && note.innerT"></div>
+        <div
+          id="editor-text"
+          class="text"
+          @input="textInput"
+          contenteditable
+          v-html="note && note.innerT"
+        ></div>
         <div class="control" @click="changeStyle">
           <span data-command="insertOrderedList" class="iconfont iconordered-list"></span>
           <span data-command="insertUnorderedList" class="iconfont iconwuxu"></span>
@@ -31,6 +37,7 @@
           <span data-command="justifyLeft" class="iconfont iconduiqi-copy-copy"></span>
           <span data-command="justifyCenter" class="iconfont icondingduiqi"></span>
           <span data-command="justifyRight" class="iconfont iconduiqi-copy"></span>
+          <input type="color" @change="changeStyle" data-command="foreColor" />
         </div>
       </div>
     </div>
@@ -48,10 +55,12 @@ export default {
       title: "",
       sta: 0, //0 新建   1修改  2删除
       note: {},
+      color: "",
+      isRfresh: false,
     };
   },
   computed: {
-    ...mapGetters(['noteList'])
+    ...mapGetters(["noteList"])
   },
 
   methods: {
@@ -59,47 +68,62 @@ export default {
       this.fontCount = this.editorDom && this.editorDom.innerText.length;
     },
     prev() {
-      let tid = this.sta==1?this.note.tid:Date.now();
-      let note = newNote({
-        tid,
-        title: this.title,
-        group: "work",
-        innerT: this.editorDom.innerHTML
-      });
-      this.controlNoteList({ note, sta: this.sta });
       this.$router.back();
-      this.$emit("back");
     },
     showmenu() {
       console.log("showmenu");
     },
     changeStyle(e) {
       let dataset = { ...e.target.dataset };
-      let { command, value } = dataset;
+      let { command } = dataset;
+      let value = e.target.value;
       document.execCommand(command, false, value || null);
     },
     _check() {
       let sta = this.$route.query.sta;
       this.sta = sta;
     },
-    getCurrent () {
-      this.note = this.noteList.find(item=>{
+    getCurrent() {
+      this.note = this.noteList.find(item => {  
         return item.tid === this.tid;
       });
       this.title = this.note && this.note.title;
+      if (!this.note && this.tid !== 0) {
+        this.isRfresh = true;
+        this.$router.back();
+        return;
+      }
+      this.fontCount = this.note && this.note.innerT. length || 0;
     },
 
     ...mapActions(["controlNoteList"])
   },
-  // beforeRouteLeave(to, from, next) {
-  //   next();
-  // },
+  beforeRouteLeave(to, from, next) {
+    if (!this.fontCount && (this.title && this.title.trim() === "")) {
+      next();
+      return;
+    }
+    if(!this.isRfresh){
+      console.log('返回刷新');
+      this.$emit("back");
+    }else{
+      window.location.reload();
+    }
+    let tid = this.sta == 1 ? this.note && this.note.tid : Date.now();
+    let note = newNote({
+      tid,
+      title: this.title,
+      group: "work",
+      innerT: this.editorDom.innerHTML
+    });
+    this.controlNoteList({ note, sta: this.sta });
+    next();
+  },
   mounted() {
     this.editorDom = document.getElementById("editor-text");
     this._check();
     this.tid = this.$route.params.tid || 0;
     this.getCurrent();
-    
   },
   components: {
     Header
@@ -139,6 +163,13 @@ export default {
         span {
           padding: 10px;
         }
+        input {
+          width: 16px;
+          height: 16px;
+          border: 0;
+          padding: 10px;
+          background-color: #fff;
+        }
       }
       .text {
         font-size: $font-size-mm;
@@ -147,11 +178,16 @@ export default {
         border: none;
         width: 100%;
         box-sizing: border-box;
-        line-height: 1.2;
+        line-height: 1.4;
+        letter-spacing: 0.5px;
         position: absolute;
         top: 0;
         bottom: 48px;
         overflow: auto;
+        &:empty::before {
+          content: "说点啥好的呢？";
+          color: #ccc;
+        }
       }
     }
     .info {
@@ -167,8 +203,8 @@ export default {
       padding: 0 20px;
       width: 100%;
       box-sizing: border-box;
-      height: 30px;
-      font-size: 30px;
+      height: 35px;
+      font-size: 28px;
       background-color: $bg-color-d;
       color: #000;
       font-weight: 550;

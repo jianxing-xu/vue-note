@@ -10,7 +10,7 @@ export default new Vuex.Store({
     noteList: storage.get(key)
   },
   getters: {
-    noteList: state => state.noteList
+    noteList: state => state.noteList 
   },
   mutations: {
     setNoteList (state,list) {

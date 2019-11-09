@@ -42,6 +42,7 @@ export default {
   overflow: hidden;
   box-sizing: border-box;
   .content {
+    font-size: $font-size-m;
     max-height: 125px;
     overflow: hidden;
     max-height: 125px;
@@ -56,6 +57,9 @@ export default {
     line-height: 2;
     color: $font-color-d;
     font-size: $font-size-l;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
   .info {
     color: $font-color-ll;

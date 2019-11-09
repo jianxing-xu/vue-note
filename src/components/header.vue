@@ -5,8 +5,9 @@
       <span :class="['iconfont',leftIcon]"></span>
       <span class="title">{{title}}</span>
     </div>
-    <div class="right" @click="clickright">
-      <span class="iconfont" :class="rightIcon"></span>
+    <div class="right">
+      <span class="iconfont mode" :class="modeIcon" @click="clickmode"></span>
+      <span class="iconfont" :class="rightIcon" @click="clickright"></span>
     </div>
   </div>
 </template>
@@ -21,6 +22,10 @@ export default {
     rightIcon: {
       type: String,
       default: "iconeditor"
+    },
+    modeIcon: {
+      type: String,
+      default: ""
     },
     title: {
       type: String,
@@ -38,6 +43,9 @@ export default {
     },
     clickright () {
       this.$emit('clickright');
+    },
+    clickmode () {
+      this.$emit('clickmode');
     }
   }
 };
@@ -63,6 +71,11 @@ export default {
   .left{
     display: flex;
     align-items: center;
+  }
+  .right{
+    .mode{
+      padding-right: 15px;
+    }
   }
 }
 </style>
