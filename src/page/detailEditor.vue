@@ -104,7 +104,6 @@ export default {
       return;
     }
     if(!this.isRfresh){
-      console.log('返回刷新');
       this.$emit("back");
     }else{
       window.location.reload();

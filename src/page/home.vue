@@ -11,7 +11,12 @@
     />
     <template>
       <transition-group name="list" tag="ul" class="list" v-if="mode=='column'">
-        <li v-for="(note) in noteList" :key="note.tid">
+        <li
+          v-for="(note) in noteList"
+          :key="note.tid"
+          @touchstart="showDelete(note)"
+          @touchend="clearTime"
+        >
           <Item @clickItem="clickItem(note)" :note="note" />
         </li>
       </transition-group>
@@ -19,12 +24,22 @@
     <template v-if="mode=='pubu'">
       <div class="pubu">
         <ul class="left" ref="left">
-          <li v-for="(note) in leftData" :key="note.tid">
+          <li
+            v-for="(note) in leftData"
+            :key="note.tid"
+            @touchstart="showDelete(note)"
+            @touchend="clearTime"
+          >
             <Item @clickItem="clickItem(note)" :note="note" />
           </li>
         </ul>
         <ul class="right" ref="right">
-          <li v-for="(note) in rightData" :key="note.tid">
+          <li
+            v-for="(note) in rightData"
+            :key="note.tid"
+            @touchstart="showDelete(note)"
+            @touchend="clearTime"
+          >
             <Item @clickItem="clickItem(note)" :note="note" />
           </li>
         </ul>
@@ -33,22 +48,26 @@
     <transition name="slide">
       <router-view @back="back"></router-view>
     </transition>
+    <Dialog ref="dialog" @clickLeft="deleteOk" msg="确认删除？"/>
   </div>
 </template>
 
 <script>
 import Header from "@/components/header.vue";
 import Item from "@/components/item.vue";
-import { mapGetters } from "vuex";
+import Dialog from "@/base/dialog.vue"
+import { mapGetters, mapActions } from "vuex";
 export default {
   data() {
     return {
       leftIcon: "iconmenu1153767easyiconnet",
       rightIcon: "iconeditor",
       modeIcon: "iconzhuanhuan",
-      mode: "pubu",
+      mode: "column",
       leftData: [],
-      rightData: []
+      rightData: [],
+      long: null,
+      deleteNote: null
     };
   },
   computed: {
@@ -62,16 +81,31 @@ export default {
         query: { sta: 1 }
       });
     },
+    showDelete(note) {
+      clearTimeout(this.long);
+      this.long = setTimeout(() => {
+        this.$refs.dialog.show();
+        this.deleteNote = note;
+      }, 1000);
+    },
+    clearTime() {
+      clearTimeout(this.long);
+    },
     changeMode() {
       this.mode = this.mode === "pubu" ? "column" : "pubu";
       if (this.mode === "pubu") {
         this.updaeWaterfull();
       }
     },
+    deleteOk () {
+      this.controlNoteList({note:this.deleteNote,sta: 2});
+      if(this.mode==="pubu"){
+        this.updaeWaterfull();
+      }
+    },
     leftBar() {},
     async updaeWaterfull() {
       if (this.mode === "column") {
-        console.log("column模式");
         return;
       }
       this.leftData = [];
@@ -97,7 +131,10 @@ export default {
     },
     back() {
       this.updaeWaterfull();
-    }
+    },
+
+
+    ...mapActions(['controlNoteList'])
   },
 
   mounted() {
@@ -105,7 +142,8 @@ export default {
   },
   components: {
     Header,
-    Item
+    Item,
+    Dialog
   }
 };
 </script>
@@ -123,7 +161,11 @@ export default {
   }
   .list-enter-active,
   .list-leave-active {
-    transition: all 0.5s ease-in;
+    width: 100%;
+    transition: all 0.4s ease-in;
+  }
+  .list-leave-active{
+    position:absolute;
   }
   .slide-enter,
   .slide-leave-to {
@@ -132,7 +174,7 @@ export default {
   }
   .slide-enter-active,
   .slide-leave-active {
-    transition: all 0.5s ease;
+    transition: all 0.4s ease;
     position: absolute;
     top: 0;
   }
@@ -171,6 +213,7 @@ export default {
     }
   }
   .list {
+    position: relative;
     & > li {
       list-style: none;
     }
