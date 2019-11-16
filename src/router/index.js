@@ -13,6 +13,11 @@ const routes = [
         path: 'detail/:tid',
         name: 'detail',
         component: () => import('@/page/detailEditor.vue')
+      },
+      {
+        path: 'groupEditor',
+        name: 'groupEditor',
+        component: () => import('@/components/groupEditor.vue')
       }
     ]
   },

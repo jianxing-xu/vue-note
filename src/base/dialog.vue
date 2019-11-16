@@ -1,9 +1,9 @@
 <template>
   <!--根组件-->
   <transition name="dialog">
-    <div class="mask" v-if="isShow">
+    <div class="mask" v-show="isShow">
       <div class="dialog-wrapper">
-        <div class="content">{{msg}}</div>
+        <div class="content"><slot name="msg"></slot></div>
         <div class="btn">
           <span class="left" @click="clickLeft">{{leftText}}</span>
           <span class="right" @click="clickRight">{{rightText}}</span>
@@ -16,10 +16,6 @@
 <script>
 export default {
   props: {
-    msg:{
-      type: String,
-      default: '',
-    },
     leftText: {
       type: String,
       default: "确定"
@@ -83,6 +79,7 @@ export default {
     display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 4;
 }
 .dialog-wrapper {
   position: absolute;

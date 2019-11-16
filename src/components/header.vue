@@ -6,6 +6,7 @@
       <span class="title">{{title}}</span>
     </div>
     <div class="right">
+      <span @click="clicktext">{{rightText}}</span>
       <span class="iconfont mode" :class="modeIcon" @click="clickmode"></span>
       <span class="iconfont" :class="rightIcon" @click="clickright"></span>
     </div>
@@ -15,13 +16,17 @@
 <script>
 export default {
   props: {
+    rightText:{
+      type: String,
+      default: ''
+    },
     leftIcon: {
       type: String,
       default: "iconmenu1153767easyiconnet"
     },
     rightIcon: {
       type: String,
-      default: "iconeditor"
+      default: ""
     },
     modeIcon: {
       type: String,
@@ -30,7 +35,7 @@ export default {
     title: {
       type: String,
       default: "便签"
-    }
+    },
   },
   data () {
     return {
@@ -38,6 +43,9 @@ export default {
     }
   },
   methods: {
+    clicktext(){
+      this.$emit('clicktext');
+    },
     clickleft () {
       this.$emit('clickleft');
     },
@@ -54,7 +62,7 @@ export default {
 .header-wrapper{
   padding: 0 20px;
   box-sizing: border-box;
-  font-size: $font-size-ll;
+  font-size: $font-size-l;
   color: $font-color-d;
   width: 100%;
   min-height: 68px;

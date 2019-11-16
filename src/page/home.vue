@@ -1,6 +1,7 @@
 <template>
   <!--根组件-->
   <div class="home-wrapper">
+    <SideBar ref="sidebar" @clickGroup="back" />
     <Header
       :leftIcon="leftIcon"
       :rightIcon="rightIcon"
@@ -10,9 +11,9 @@
       @clickmode="changeMode"
     />
     <template>
-      <transition-group name="list" tag="ul" class="list" v-if="mode=='column'">
+      <transition-group name="list" tag="ul" class="list" v-if="mode==='column'">
         <li
-          v-for="(note) in noteList"
+          v-for="(note) in filterNotes"
           :key="note.tid"
           @touchstart="showDelete(note)"
           @touchend="clearTime"
@@ -21,8 +22,8 @@
         </li>
       </transition-group>
     </template>
-    <template v-if="mode=='pubu'">
-      <div class="pubu">
+    <template>
+      <div class="pubu" v-if="mode==='pubu'">
         <ul class="left" ref="left">
           <li
             v-for="(note) in leftData"
@@ -48,14 +49,21 @@
     <transition name="slide">
       <router-view @back="back"></router-view>
     </transition>
-    <Dialog ref="dialog" @clickLeft="deleteOk" msg="确认删除？"/>
+    <Dialog ref="dialog" @clickLeft="deleteOk">
+      <p slot="msg">确认删除？</p>
+    </Dialog>
+    <div class="nothing" v-show="!(filterNotes.length)">
+      <h3>暂无此类便签</h3>
+      <h4>请点击右上角创建便签</h4>
+    </div>
   </div>
 </template>
 
 <script>
 import Header from "@/components/header.vue";
 import Item from "@/components/item.vue";
-import Dialog from "@/base/dialog.vue"
+import Dialog from "@/base/dialog.vue";
+import SideBar from "@/components/sideBar.vue";
 import { mapGetters, mapActions } from "vuex";
 export default {
   data() {
@@ -71,7 +79,7 @@ export default {
     };
   },
   computed: {
-    ...mapGetters(["noteList"])
+    ...mapGetters(["noteList", "filterNotes"])
   },
   methods: {
     clickItem(note) {
@@ -97,30 +105,35 @@ export default {
         this.updaeWaterfull();
       }
     },
-    deleteOk () {
-      this.controlNoteList({note:this.deleteNote,sta: 2});
-      if(this.mode==="pubu"){
+    deleteOk() {
+      this.controlNoteList({ note: this.deleteNote, sta: 2 });
+      if (this.mode === "pubu") {
         this.updaeWaterfull();
       }
     },
-    leftBar() {},
+    leftBar() {
+      this.$refs.sidebar.show();
+    },
     async updaeWaterfull() {
       if (this.mode === "column") {
         return;
       }
       this.leftData = [];
       this.rightData = [];
-      for (let i = 0; i < this.noteList.length; i++) {
-        await this.$nextTick(() => {
-          let h1 = this.$refs.left.clientHeight;
-          let h2 = this.$refs.right.clientHeight;
-          if (h1 <= h2) {
-            this.leftData.push(this.noteList[i]);
-          } else {
-            this.rightData.push(this.noteList[i]);
-          }
-        });
-      }
+      await setTimeout(async () => {
+        let len = this.filterNotes.length;
+        for (let i = 0; i < len; i++) {
+          await this.$nextTick(() => {
+            let h1 = this.$refs.left.clientHeight;
+            let h2 = this.$refs.right.clientHeight;
+            if (h1 <= h2) {
+              this.leftData.push(this.filterNotes[i]);
+            } else {
+              this.rightData.push(this.filterNotes[i]);
+            }
+          });
+        }
+      }, 0);
     },
     newEditor() {
       this.$router.push({
@@ -133,8 +146,7 @@ export default {
       this.updaeWaterfull();
     },
 
-
-    ...mapActions(['controlNoteList'])
+    ...mapActions(["controlNoteList"])
   },
 
   mounted() {
@@ -143,7 +155,8 @@ export default {
   components: {
     Header,
     Item,
-    Dialog
+    Dialog,
+    SideBar
   }
 };
 </script>
@@ -154,6 +167,15 @@ export default {
   height: 100%;
   position: relative;
   box-sizing: border-box;
+  .nothing {
+    text-align: center;
+    line-height: 1.5;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: $font-size-mm;
+  }
   .list-enter,
   .list-leave-to {
     transform: translate3d(30%, 0, 0);
@@ -162,10 +184,10 @@ export default {
   .list-enter-active,
   .list-leave-active {
     width: 100%;
-    transition: all 0.4s ease-in;
+    transition: all 0.2s ease-in;
   }
-  .list-leave-active{
-    position:absolute;
+  .list-leave-active {
+    position: absolute;
   }
   .slide-enter,
   .slide-leave-to {
@@ -174,7 +196,7 @@ export default {
   }
   .slide-enter-active,
   .slide-leave-active {
-    transition: all 0.4s ease;
+    transition: all 0.2s ease;
     position: absolute;
     top: 0;
   }
@@ -216,9 +238,7 @@ export default {
     position: relative;
     & > li {
       list-style: none;
-    }
-    li {
-      transition: all 1s;
+      transition: all 0.4s;
     }
     width: 100%;
     position: absolute;

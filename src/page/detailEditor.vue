@@ -9,16 +9,18 @@
       rightIcon="iconmenu"
     />
     <div class="content">
-      <input v-model="title" type="text" class="title" placeholder="标题" />
+      <input v-focus v-model="title" type="text" class="title" placeholder="标题" />
       <div class="info">
         <div>
-          <span class="time">12:12 |</span>
+          <span class="time">{{(note && (note.time) || Date.now()) | format("hh:mm") }} |</span>
           <span class="count">{{fontCount}}字</span>
         </div>
-        <span class="group">
-          全部
+        <div class="group">
+          <select v-model="group">
+            <option :selected="group===g?group==g:group=='全部'" :value="g" v-for="(g, index) in groups" :key="index">{{g}}</option>
+          </select>
           <i class="iconfont iconlower-triangle1"></i>
-        </span>
+        </div>
       </div>
       <div class="rich-text">
         <div
@@ -41,37 +43,62 @@
         </div>
       </div>
     </div>
+    <Dialog />
+    <div class="menu-pos">
+      <Menu ref="menu" @clickItem="clickItem" :items="[{text:'置顶',g:'top'},{text:'删除',g:'del'}]" />
+    </div>
   </div>
 </template>
 
 <script>
 import Header from "@/components/header.vue";
 import { newNote } from "@/assets/js/model";
+import Menu from "@/base/menu.vue";
+import Dialog from "@/base/dialog.vue";
 import { mapActions, mapGetters } from "vuex";
 export default {
   data() {
     return {
       fontCount: 0,
       title: "",
-      sta: 0, //0 新建   1修改  2删除
+      group: '',
+      sta: 0, //0 新建   1修改  2删除  3置顶切换
       note: {},
       color: "",
-      isRfresh: false,
+      isRfresh: false
     };
-  },
+  },  
   computed: {
-    ...mapGetters(["noteList"])
+    ...mapGetters(["noteList","groups"])
   },
 
   methods: {
+    changeGroup(e){
+      this.group = e.target.value;
+      console.log(e.target.value);
+      //this.controlNoteList({note:this.note, sta: 4, group: this.group || "全部"});
+    },
+    clickItem(g) {
+      if (g === "del") {
+        if(this.sta === 0){
+          return;
+        }
+        this.controlNoteList({ note: this.note, sta: 2 });
+      }
+      if(g === 'top') {
+        console.log('toTop')
+        this.controlNoteList({note: this.note, sta: 3});
+      }
+      this.$router.back();
+    },
+    showmenu() {
+      this.$refs.menu.toggle();
+    },
     textInput() {
       this.fontCount = this.editorDom && this.editorDom.innerText.length;
     },
     prev() {
       this.$router.back();
-    },
-    showmenu() {
-      console.log("showmenu");
     },
     changeStyle(e) {
       let dataset = { ...e.target.dataset };
@@ -83,38 +110,41 @@ export default {
       let sta = this.$route.query.sta;
       this.sta = sta;
     },
-    getCurrent() {
-      this.note = this.noteList.find(item => {  
+    _getCurrent() {
+      this.note = this.noteList.find(item => {
         return item.tid === this.tid;
       });
       this.title = this.note && this.note.title;
+      this.group = this.note && this.note.group;
       if (!this.note && this.tid !== 0) {
         this.isRfresh = true;
         this.$router.back();
         return;
       }
-      this.fontCount = this.note && this.note.innerT. length || 0;
+      this.fontCount = (this.note && this.note.innerT.length) || 0;
     },
 
-    ...mapActions(["controlNoteList"])
+    ...mapActions(["controlNoteList","controlGroups"])
   },
   beforeRouteLeave(to, from, next) {
-    if (!this.fontCount && (this.title && this.title.trim() === "")) {
-      next();
-      return;
-    }
-    if(!this.isRfresh){
+    if (!this.isRfresh) {
       this.$emit("back");
-    }else{
+    } else {
       window.location.reload();
     }
+    
     let tid = this.sta == 1 ? this.note && this.note.tid : Date.now();
     let note = newNote({
       tid,
       title: this.title,
-      group: "work",
-      innerT: this.editorDom.innerHTML
+      group: this.group || "全部",
+      innerT: this.editorDom.innerHTML,
+      normalPos: this.sta === 0 ? this.noteList.length : this.note.normalPos,
     });
+    if (!this.fontCount && (!this.title || this.title.trim()==="") && this.sta === 0) {
+      next();
+      return;
+    }
     this.controlNoteList({ note, sta: this.sta });
     next();
   },
@@ -122,10 +152,15 @@ export default {
     this.editorDom = document.getElementById("editor-text");
     this._check();
     this.tid = this.$route.params.tid || 0;
-    this.getCurrent();
+    if(this.tid===0){
+      return;
+    }
+    this._getCurrent();
   },
   components: {
-    Header
+    Header,
+    Dialog,
+    Menu
   }
 };
 </script>
@@ -137,6 +172,7 @@ export default {
   top: 0;
   width: 100%;
   height: 100vh;
+  z-index: 1;
   .content {
     width: 100%;
     position: absolute;
@@ -171,6 +207,7 @@ export default {
         }
       }
       .text {
+        -webkit-user-select: none;
         font-size: $font-size-mm;
         padding: 0 27px;
         outline: none;
@@ -197,6 +234,15 @@ export default {
       font-size: $font-size;
       display: flex;
       justify-content: space-between;
+      select{
+        background-color:transparent;
+        outline: none;
+        border: none;
+        appearance:none;
+        padding: 1px 2px;
+        font-size: $font-size;
+      }
+      
     }
     .title {
       padding: 0 20px;
@@ -208,6 +254,11 @@ export default {
       color: #000;
       font-weight: 550;
     }
+  }
+  .menu-pos {
+    position: absolute;
+    top: 68px;
+    right: 30px;
   }
 }
 </style>

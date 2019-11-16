@@ -5,7 +5,7 @@
     <div class="content" v-html="note.innerT">
       <!-- content -->
     </div>
-    <div class="info">11月6日 20:22</div>
+    <div class="info">{{note.time | format}}</div>
   </div>
 </template>
 
@@ -39,8 +39,9 @@ export default {
   background-color: #fff;
   border-radius: 15px;
   color: $font-color;
-  overflow: hidden;
+  overflow: hidden; 
   box-sizing: border-box;
+  box-shadow: 0 5px 10px 0 rgba($color: #b9ff91, $alpha: .1);
   .content {
     font-size: $font-size-m;
     max-height: 125px;
