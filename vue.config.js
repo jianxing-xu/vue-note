@@ -1,6 +1,7 @@
 module.exports = {
+  publicPath: process.env.NODE_ENV === 'production' ? './' : '/',
   devServer: {
-    host: '192.168.1.11'
+    host: '127.0.0.1'
   },
   css: {
     loaderOptions: { /** 配置全局Sass变量文件 */
