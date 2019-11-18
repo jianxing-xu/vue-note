@@ -16,7 +16,11 @@ self.__precacheManifest = (self.__precacheManifest || []).concat([
     "url": "css/chunk-bdca3b1c.10faf89f.css"
   },
   {
-    "revision": "6d2b29b5c4f2d3ada1dfa544737e29ef",
+    "revision": "75c30a52364d376c235e3d1bae02ac09",
+    "url": "css/iconfont.css"
+  },
+  {
+    "revision": "acd7af5e78b71e3deeea7fb027c492ca",
     "url": "index.html"
   },
   {
