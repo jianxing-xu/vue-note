@@ -14,7 +14,7 @@
 importScripts("https://storage.googleapis.com/workbox-cdn/releases/4.3.1/workbox-sw.js");
 
 importScripts(
-  "precache-manifest.e65c242c27a9a69e3b993524764aaa61.js"
+  "precache-manifest.72afb14f824b340d33a0ea826226ffad.js"
 );
 
 workbox.core.setCacheNameDetails({prefix: "vue-note"});
