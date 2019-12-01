@@ -1,6 +1,6 @@
 <template>
   <!--根组件-->
-  <div class="home-wrapper">
+  <div class="home-wrapper" @touchmove="clearTime($event)">
     <SideBar ref="sidebar" @clickGroup="back" />
     <Header
       :leftIcon="leftIcon"
@@ -15,8 +15,8 @@
         <li
           v-for="(note) in filterNotes"
           :key="note.tid"
-          @touchstart="showDelete(note)"
-          @touchend="clearTime"
+          @touchstart="showDelete($event,note)"
+          @touchend="clearTime($event)"
         >
           <Item @clickItem="clickItem(note)" :note="note" />
         </li>
@@ -28,8 +28,8 @@
           <li
             v-for="(note) in leftData"
             :key="note.tid"
-            @touchstart="showDelete(note)"
-            @touchend="clearTime"
+            @touchstart="showDelete($event,note)"
+            @touchend="clearTime($event)"
           >
             <Item @clickItem="clickItem(note)" :note="note" />
           </li>
@@ -38,8 +38,8 @@
           <li
             v-for="(note) in rightData"
             :key="note.tid"
-            @touchstart="showDelete(note)"
-            @touchend="clearTime"
+            @touchstart="showDelete($event,note)"
+            @touchend="clearTime($event)"
           >
             <Item @clickItem="clickItem(note)" :note="note" />
           </li>
@@ -89,15 +89,22 @@ export default {
         query: { sta: 1 }
       });
     },
-    showDelete(note) {
+    showDelete(e,note) {
+      this.startPos = e.touches[0].pageY;
       clearTimeout(this.long);
       this.long = setTimeout(() => {
         this.$refs.dialog.show();
         this.deleteNote = note;
       }, 1000);
     },
-    clearTime() {
-      clearTimeout(this.long);
+    clearTime(e) {
+      let moveY = e.touches[0] && e.touches[0].pageY || 0;
+      if(Math.abs(this.startPos - moveY) < 20) {
+        return ;
+      }
+      if(this.long){
+        clearTimeout(this.long);
+      }
     },
     changeMode() {
       this.mode = this.mode === "pubu" ? "column" : "pubu";
